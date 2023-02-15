@@ -11,18 +11,18 @@
     </nav>
     <table class="table">
       <tr>
-        <th>EIB</th>
+        <!-- <th>EIB</th>
         <th>Title</th>
         <th>Description</th>
-        <th>Tags</th>
+        <th>Tags</th> -->
         <th>Image Thumbnail</th>
       </tr>
-      <% data.forEach(function(item) { %>
+      <% images.forEach(function(item) { %>
         <tr>
-          <td><%= item.EIB %></td>
+          <!-- <td><%= item.EIB %></td>
           <td><%= item.Title %></td>
           <td><%= item.Description %></td>
-          <td><%= item.Tags %></td>
+          <td><%= item.Tags %></td> -->
           <td><img src="<%= item.ImageUrl %>" width="100" height="100"></td>
         </tr>
       <% }); %>
