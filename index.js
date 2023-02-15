@@ -54,7 +54,9 @@ app.post('/create', upload.single('image'), (req, res) => {
     }
   });
   // Add code to save data to your database
-  res.redirect('/');
+  setTimeout(() => {
+    res.redirect('/');
+  }, 3000);
 });
 
 app.listen(port, () => {
