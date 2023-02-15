@@ -3,6 +3,9 @@ const app = express();
 const port = 3000;
 const uuid = require('uuid');
 const AWS = require('aws-sdk');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+const fs = require('fs');
 
 AWS.config.update({
   region: 'us-east-1',
@@ -32,8 +35,21 @@ app.get('/new', (req, res) => {
   res.render('new');
 });
 
-app.post('/create', (req, res) => {
+app.post('/create', upload.single('image'), (req, res) => {
   req.body.EIB = uuid.v4();
+  const fileContent = fs.readFileSync(req.file.path);
+  const params = {
+    Bucket: 'mediasharingapp',
+    Key: req.file.originalname,
+    Body: fileContent
+  };
+  s3.upload(params, function (err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`File uploaded successfully. ${data.Location}`);
+    }
+  });
   // Add code to save data to your database
   res.redirect('/');
 });
