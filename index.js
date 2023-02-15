@@ -5,7 +5,7 @@ const uuid = require('uuid');
 const AWS = require('aws-sdk');
 
 AWS.config.update({
-  region: 'us-west-2',
+  region: 'us-east-1',
 });
 
 const s3 = new AWS.S3();
@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  const params = { Bucket: 'your-bucket-name', MaxKeys: 100 };
+  const params = { Bucket: 'mediasharingapp', MaxKeys: 100 };
   s3.listObjectsV2(params, function (err, data) {
     if (err) {
       console.log(err, err.stack);
