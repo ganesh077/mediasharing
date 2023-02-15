@@ -1,36 +1,54 @@
 const express = require('express');
+const AWS = require('aws-sdk');
+const uuid = require('uuid');
 const app = express();
 const port = 3000;
-const uuid = require('uuid');
-app.use(express.static('public'));
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }));
-var localStorage = require('local-storage');
 
+// Set up AWS credentials and region
+const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
+
+// Set up S3 bucket name
+const bucketName = 'mediasharingapp';
+
+// Route to retrieve all items from S3 bucket and render them in the web page
 app.get('/', (req, res) => {
-    let data = [{ EIB: '4fc978c6-7835-4094-960b-723b02fc1d8f', Title: 'Freedom', Description: '"Never Back Down" is a martial arts drama that follows the story of a teenager who moves to a new town and becomes involved in an underground mixed martial arts fight club', Tags: 'Martial Arts,Drama', Image: 'image1.jpg' },
-                { EIB: '7007beda-c1d3-457b-bb6f-b33d97b2183d', Title: 'Dune', Description: 'The movie is set in the distant future and follows the journey of a young man named Paul Atreides as he becomes embroiled in a power struggle for control of the desert planet Arrakis, also known as Dune.', Tags: 'Science Fiction, Adventure', Image: 'image2.jpg' }];
-    if (localStorage.get('newData')) {
-      data = data.concat(JSON.parse(localStorage.get('newData')));
+  s3.listObjectsV2({ Bucket: bucketName }, (err, data) => {
+    if (err) {
+      console.log(`Error getting objects from S3 bucket: ${err}`);
+      res.status(500).send('Error getting objects from S3 bucket');
+    } else {
+      let images = data.Contents.map(obj => {
+        let key = obj.Key;
+        let url = s3.getSignedUrl('getObject', { Bucket: bucketName, Key: key });
+        return { key: key, url: url };
+      });
+      res.render('index', { images: images });
     }
-    res.render('index', { data: data });
   });
+});
 
+// Route to render form to upload new image
 app.get('/new', (req, res) => {
   res.render('new');
 });
 
+// Route to handle form submission and upload new image to S3 bucket
 app.post('/create', (req, res) => {
-    req.body.EIB = uuid.v4();
-    let newData = [];
-    if (localStorage.get('newData')) {
-      newData = JSON.parse(localStorage.get('newData'));
+  let file = req.files.image;
+  let key = uuid.v4() + '-' + file.name;
+  let params = { Bucket: bucketName, Key: key, Body: file.data };
+  s3.upload(params, (err, data) => {
+    if (err) {
+      console.log(`Error uploading object to S3 bucket: ${err}`);
+      res.status(500).send('Error uploading object to S3 bucket');
+    } else {
+      console.log(`Object uploaded to S3 bucket: ${data.Location}`);
+      res.redirect('/');
     }
-    newData.push(req.body);
-    localStorage.set('newData', JSON.stringify(newData));
-    res.redirect('/');
   });
-  
+});
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
