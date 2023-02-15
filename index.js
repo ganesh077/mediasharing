@@ -26,6 +26,9 @@ app.get('/', (req, res) => {
       const images = data.Contents.filter(function (item) {
         return item.Key.match(/\.(jpg|jpeg|png|gif)$/);
       });
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', 0);
       res.render('index', { images: images, params: params });
     }
   });
