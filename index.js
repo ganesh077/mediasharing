@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
       const images = data.Contents.filter(function (item) {
         return item.Key.match(/\.(jpg|jpeg|png|gif)$/);
       });
-      res.render('index', { images: images });
+      res.render('index', { images: images, params: params });
     }
   });
 });
