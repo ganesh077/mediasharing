@@ -92,7 +92,7 @@ app.post('/create', upload.single('image'), (req, res) => {
     } else {
       setTimeout(() => {
         res.redirect('/');
-      }, 3000);
+      }, 2000);
     }
   });
 });
