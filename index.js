@@ -11,6 +11,10 @@ AWS.config.update({
   region: 'us-east-1',
 });
 
+AWS.config.credentials = new AWS.EC2MetadataCredentials({
+  httpOptions: { timeout: 5000 }
+  });
+
 const s3 = new AWS.S3();
 
 app.set('view engine', 'ejs');
@@ -18,46 +22,81 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  const params = { Bucket: 'mediasharingapp', MaxKeys: 100 };
-  s3.listObjectsV2(params, function (err, data) {
-    if (err) {
-      console.log(err, err.stack);
+  const dynamoParams = {
+    TableName: 'movies'
+  };
+
+  dynamoDb.scan(dynamoParams, (error, data) => {
+    if (error) {
+      console.error(error);
+      res.status(400).send({ error: 'Could not fetch items from DynamoDB' });
     } else {
-      const images = data.Contents.filter(function (item) {
-        return item.Key.match(/\.(jpg|jpeg|png|gif)$/);
+      const s3Params = { Bucket: 'mediasharingapp', MaxKeys: 100 };
+      s3.listObjectsV2(s3Params, function (err, s3Data) {
+        if (err) {
+          console.log(err, err.stack);
+          res.status(400).send({ error: 'Could not fetch images from S3' });
+        } else {
+          const images = s3Data.Contents.filter(function (item) {
+            return item.Key.match(/\.(jpg|jpeg|png|gif)$/);
+          });
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', 0);
+          res.render('index', { data: data.Items, images: images, params: s3Params });
+        }
       });
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', 0);
-      res.render('index', { images: images, params: params });
     }
   });
 });
+
 
 app.get('/new', (req, res) => {
   res.render('new');
 });
 
+
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
 app.post('/create', upload.single('image'), (req, res) => {
   req.body.EIB = uuid.v4();
   const fileContent = fs.readFileSync(req.file.path);
-  const params = {
+  const s3Params = {
     Bucket: 'mediasharingapp',
     Key: req.file.originalname,
     Body: fileContent
   };
-  s3.upload(params, function (err, data) {
+  s3.upload(s3Params, function (err, data) {
     if (err) {
       console.log(err);
     } else {
       console.log(`File uploaded successfully. ${data.Location}`);
     }
   });
-  // Add code to save data to your database
-  setTimeout(() => {
-    res.redirect('/');
-  }, 3000);
+
+  const dynamoDbParams = {
+    TableName: 'movies',
+    Item: {
+      EIB: req.body.EIB,
+      Title: req.body.Title,
+      Description: req.body.Description,
+      Tags: req.body.Tags,
+      Image: req.file.originalname
+    }
+  };
+
+  dynamoDb.put(dynamoDbParams, (error) => {
+    if (error) {
+      console.error(error);
+      res.status(400).send({ error: 'Could not create item' });
+    } else {
+      setTimeout(() => {
+        res.redirect('/');
+      }, 3000);
+    }
+  });
 });
+
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
