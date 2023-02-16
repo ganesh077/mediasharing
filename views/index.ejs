@@ -17,13 +17,13 @@
         <th>Tags</th>
         <th>Image Thumbnail</th>
       </tr>
-      <% images.forEach(function(item) { %>
+      <% data.forEach(function(item) { %>
         <tr>
-          <td><%= image.EIB %></td>
-          <td><%= image.Title %></td>
-          <td><%= image.Description %></td>
-          <td><%= image.Tags %></td>
-          <td><img src="https://s3.amazonaws.com/<%= params.Bucket %>/<%= image.Key %>" width="100" height="100"></td>
+          <td><%= data.EIB %></td>
+          <td><%= data.Title %></td>
+          <td><%= data.Description %></td>
+          <td><%= data.Tags %></td>
+          <td><img src="https://s3.amazonaws.com/<%= params.Bucket %>/<%= item.Key %>" width="100" height="100"></td>
         </tr>
       <% }); %>
     </table>
