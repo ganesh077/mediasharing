@@ -4,29 +4,32 @@
     <title>Media Sharing App</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   </head>
-  
   <body>
     <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Media Sharing App</a>
     </nav>
-    <table class="table">
-      <tr>
-        <th>EIB</th>
-        <th>Title</th>
-        <th>Description</th>
-        <th>Tags</th>
-        <th>Image Thumbnail</th>
-      </tr>
-      <% data.forEach(function(item) { %>
+    <% if (data.length > 0) { %>
+      <table class="table">
         <tr>
-          <td><%= item.EIB %></td>
-          <td><%= item.Title %></td>
-          <td><%= item.Description %></td>
-          <td><%= item.Tags %></td>
-          <td><img src="https://s3.amazonaws.com/<%= params.Bucket %>/<%= item.Image %>" width="100" height="100"></td>
+          <th>EIB</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Tags</th>
+          <th>Image Thumbnail</th>
         </tr>
-      <% }); %>
-    </table>
+        <% data.forEach(function(item) { %>
+          <tr>
+            <td><%= item.EIB %></td>
+            <td><%= item.Title %></td>
+            <td><%= item.Description %></td>
+            <td><%= item.Tags %></td>
+            <td><img src="https://s3.amazonaws.com/<%= params.Bucket %>/<%= item.Image %>" width="100" height="100"></td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } else { %>
+      <p>No items added yet! Please add some.</p>
+    <% } %>
     <a href="/new" class="btn btn-primary">New</a>
   </body>
 </html>
