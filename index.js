@@ -97,6 +97,20 @@ app.post('/create', upload.single('image'), (req, res) => {
   });
 });
 
+app.put('/update/:id', (req, res) => {
+  const id = req.params.id;
+  const title = req.body.Title;
+  const description = req.body.Description;
+  const tags = req.body.Tags;
+  // Add code to update data to your database
+  res.redirect('/');
+});
+
+app.get('/delete/:id', (req, res) => {
+  const id = req.params.id;
+  // Add code to delete data from your database
+  res.redirect('/');
+});
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
