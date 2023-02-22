@@ -98,14 +98,14 @@ app.post('/create', upload.single('image'), (req, res) => {
 });
 
 app.get('/update/:id', (req, res) => {
-  const id = req.params.id;
+  const EIB = req.params.EIB;
   // Add code to fetch the data for the specific media item from your database
   const item = {}; // Replace with the fetched data
   res.render('update', { title: 'Update Media Item', item: item });
 });
 
 app.put('/update/:id', (req, res) => {
-  const id = req.params.id;
+  const EIB = req.params.EIB;
   const title = req.body.Title;
   const description = req.body.Description;
   const tags = req.body.Tags;
@@ -114,7 +114,7 @@ app.put('/update/:id', (req, res) => {
 });
 
 app.get('/delete/:id', (req, res) => {
-  const id = req.params.id;
+  const EIB = req.params.EIB;
   // Add code to delete data from your database
   res.redirect('/');
 });
