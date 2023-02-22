@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>New Media Item</title>
+    <title><%= title %></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
@@ -13,26 +13,34 @@
         <a class="navbar-brand" href="#">Media Sharing App</a>
     </nav>
     <div class="container">
-      <h1>New Media Item</h1>
-      <form method="POST" action="/create" enctype="multipart/form-data">
+      <h1><%= title %></h1>
+      <form method="<%= method %>" action="<%= action %>" enctype="multipart/form-data">
         <div class="form-group">
           <label for="title">Title</label>
-          <input type="text" class="form-control" id="title" name="Title" placeholder="Enter title" required>
+          <input type="text" class="form-control" id="title" name="Title" placeholder="Enter title" value="<%= item ? item.Title : '' %>" required>
         </div>
         <div class="form-group">
           <label for="description">Description</label>
-          <textarea class="form-control" id="description" name="Description" rows="3" placeholder="Enter description" required></textarea>
+          <textarea class="form-control" id="description" name="Description" rows="3" placeholder="Enter description" required><%= item ? item.Description : '' %></textarea>
         </div>
         <div class="form-group">
           <label for="tags">Tags</label>
-          <input type="text" class="form-control" id="tags" name="Tags" placeholder="Enter tags" required>
+          <input type="text" class="form-control" id="tags" name="Tags" placeholder="Enter tags" value="<%= item ? item.Tags : '' %>" required>
         </div>
+        <% if (item && item.Image) { %>
+          <img src="/images/<%= item.Image %>" width="100" height="100">
+        <% } %>
         <div class="form-group">
           <label for="image">Image</label>
-          <input type="file" class="form-control-file" id="image" name="image" required>
+          <input type="file" class="form-control-file" id="image" name="Image">
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-    </div>
-  </body>
-</html>
+        <button type="submit" class="btn btn-primary"><%= submitText %></button>
+        <% if (method === 'PUT') { %>
+          <a href="/" class="btn btn-danger">Cancel</a>
+          <button type=""submit" class="btn btn-primary">Update</button>
+          <% } %>
+          </form>
+        </div>
+          
+      </body>
+          </html>
