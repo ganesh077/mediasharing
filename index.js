@@ -97,6 +97,13 @@ app.post('/create', upload.single('image'), (req, res) => {
   });
 });
 
+app.get('/update/:id', (req, res) => {
+  const id = req.params.id;
+  // Add code to fetch the data for the specific media item from your database
+  const item = {}; // Replace with the fetched data
+  res.render('update', { title: 'Update Media Item', item: item });
+});
+
 app.put('/update/:id', (req, res) => {
   const id = req.params.id;
   const title = req.body.Title;
