@@ -103,7 +103,7 @@ app.get('/update/:id', (req, res) => {
   const params = {
     TableName: 'movies',
     Key: {
-      'id': id
+      'EIB': id
     }
   };
   dynamoDb.get(params, (err, data) => {
