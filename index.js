@@ -114,7 +114,7 @@ app.put('/update/:id', (req, res) => {
 });
 
 app.get('/delete/:id', (req, res) => {
-  const EIB = req.params.EIB;
+  const id = req.params.id;
   // Add code to delete data from your database
   res.redirect('/');
 });
