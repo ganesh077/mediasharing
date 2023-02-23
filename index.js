@@ -104,7 +104,7 @@ app.get('/update/:id', (req, res) => {
   res.render('update', { title: 'Update Media Item', item: item });
 });
 
-app.put('/update/:id', async (req, res) => {
+app.post('/update/:id', async (req, res) => {
   const id = req.params.id;
   const title = req.body.Title;
   const description = req.body.Description;
