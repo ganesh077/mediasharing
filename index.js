@@ -130,44 +130,64 @@ app.post('/update/:id', upload.single('Image'), (req, res) => {
       Bucket: 'mediasharingapp',
       Key: req.file.originalname,
       Body: fileContent,
-      ACL: 'public-read'
     };
     s3.upload(params, (err, data) => {
       if (err) {
         console.log('Error: ', err);
       } else {
         image = req.file.originalname;
+
+        // Update item in DynamoDB
+        const params = {
+          TableName: 'movies',
+          Key: {
+            'EIB': id
+          },
+          UpdateExpression: 'set Title = :title, Description = :description, Tags = :tags, Image = :image',
+          ExpressionAttributeValues: {
+            ':title': title,
+            ':description': description,
+            ':tags': tags,
+            ':image': image
+          }
+        };
+      
+        dynamoDb.update(params, (err, data) => {
+          if (err) {
+            console.log('Error: ', err);
+          } else {
+            console.log('Item updated successfully!');
+            res.redirect('/');
+          }
+        });
+      }
+    });
+  } else {
+    // Update item in DynamoDB
+    const params = {
+      TableName: 'movies',
+      Key: {
+        'EIB': id
+      },
+      UpdateExpression: 'set Title = :title, Description = :description, Tags = :tags',
+      ExpressionAttributeValues: {
+        ':title': title,
+        ':description': description,
+        ':tags': tags
+      }
+    };
+
+    dynamoDb.update(params, (err, data) => {
+      if (err) {
+        console.log('Error: ', err);
+      } else {
+        console.log('Item updated successfully!');
+        res.redirect('/');
       }
     });
   }
-
-  // Update item in DynamoDB
-  const params = {
-    TableName: 'movies',
-    Key: {
-      'EIB': id
-    },
-    UpdateExpression: 'set Title = :title, Description = :description, Tags = :tags' + (image ? ', Image = :image' : ''),
-    ExpressionAttributeValues: {
-      ':title': title,
-      ':description': description,
-      ':tags': tags
-    }
-  };
-
-  if (image) {
-    params.ExpressionAttributeValues[':image'] = image;
-  }
-
-  dynamoDb.update(params, (err, data) => {
-    if (err) {
-      console.log('Error: ', err);
-    } else {
-      console.log('Item updated successfully!');
-      res.redirect('/');
-    }
-  });
 });
+
 
 
 app.get('/delete/:id', (req, res) => {
