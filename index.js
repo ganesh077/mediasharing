@@ -192,9 +192,24 @@ app.post('/update/:id', upload.single('Image'), (req, res) => {
 
 app.get('/delete/:id', (req, res) => {
   const id = req.params.id;
-  // Add code to delete data from your database
-  res.redirect('/');
+
+  const params = {
+    TableName: 'movies',
+    Key: {
+      'EIB': id
+    }
+  };
+
+  dynamoDb.delete(params, (err, data) => {
+    if (err) {
+      console.log('Error: ', err);
+    } else {
+      console.log('Item deleted successfully!');
+      res.redirect('/');
+    }
+  });
 });
+
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
