@@ -117,7 +117,7 @@ app.get('/update/:id', (req, res) => {
 });
 
 app.post('/update/:id', upload.single('Image'), (req, res) => {
-  const id = req.body.EIB;
+  const id = req.params.id;
   const title = req.body.Title;
   const description = req.body.Description;
   const tags = req.body.Tags;
