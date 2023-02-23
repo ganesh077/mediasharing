@@ -10,4 +10,4 @@ How to RUN -
 4. Cd into the folder
 4. npm install
 5. npm start run
-6. The application will be running in port 3000 of the ec2 instance. Go to <PUBLICIP>:3000.
+6. The application will be running in port 3000 of the ec2 instance. Go to {PUBLICIP}:3000.
