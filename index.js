@@ -136,7 +136,7 @@ app.post('/update/:id', upload.single('Image'), (req, res) => {
       if (err) {
         console.log('Error: ', err);
       } else {
-        image = data.Key;
+        image = req.file.originalname;
       }
     });
   }
