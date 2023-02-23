@@ -99,7 +99,7 @@ app.post('/create', upload.single('image'), (req, res) => {
 
 
 app.get('/update/:id', (req, res) => {
-  const id = req.params.EIB;
+  const id = req.params.id;
   const params = {
     TableName: 'movies',
     Key: {
@@ -117,7 +117,7 @@ app.get('/update/:id', (req, res) => {
 });
 
 app.post('/update/:id', upload.single('Image'), (req, res) => {
-  const id = req.params.EIB;
+  const id = req.params.id;
   const title = req.body.Title;
   const description = req.body.Description;
   const tags = req.body.Tags;
