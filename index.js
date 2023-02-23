@@ -145,7 +145,7 @@ app.post('/update/:id', upload.single('Image'), (req, res) => {
   const params = {
     TableName: 'movies',
     Key: {
-      'id': id
+      'EIB': id
     },
     UpdateExpression: 'set Title = :title, Description = :description, Tags = :tags' + (image ? ', Image = :image' : ''),
     ExpressionAttributeValues: {
