@@ -106,7 +106,7 @@ app.get('/update/:id', (req, res) => {
       'id': id
     }
   };
-  docClient.get(params, (err, data) => {
+  dynamoDb.get(params, (err, data) => {
     if (err) {
       console.log('Error: ', err);
     } else {
@@ -159,7 +159,7 @@ app.post('/update/:id', upload.single('Image'), (req, res) => {
     params.ExpressionAttributeValues[':image'] = image;
   }
 
-  docClient.update(params, (err, data) => {
+  dynamoDb.update(params, (err, data) => {
     if (err) {
       console.log('Error: ', err);
     } else {
