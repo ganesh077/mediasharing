@@ -104,14 +104,51 @@ app.get('/update/:id', (req, res) => {
   res.render('update', { title: 'Update Media Item', item: item });
 });
 
-app.post('/update/:id', (req, res) => {
+app.put('/update/:id', async (req, res) => {
   const id = req.params.id;
   const title = req.body.Title;
   const description = req.body.Description;
   const tags = req.body.Tags;
-  // Add code to update data to your database
-  res.redirect('/');
+
+  // Check if an image was uploaded
+  let image = req.body.Image;
+  if (req.file) {
+    image = req.file.filename;
+  }
+
+  try {
+    // Update the item in the DynamoDB table
+    const params = {
+      TableName: "movies",
+      Key: {
+        id: id,
+      },
+      UpdateExpression: 'set #t = :t, #d = :d, #g = :g, #i = :i',
+      ExpressionAttributeNames: {
+        '#t': 'Title',
+        '#d': 'Description',
+        '#g': 'Tags',
+        '#i': 'Image',
+      },
+      ExpressionAttributeValues: {
+        ':t': title,
+        ':d': description,
+        ':g': tags,
+        ':i': image,
+      },
+      ReturnValues: 'UPDATED_NEW',
+    };
+
+    const result = await docClient.update(params).promise();
+    console.log('Updated item:', result);
+
+    res.redirect('/');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('An error occurred while updating the item.');
+  }
 });
+
 
 app.get('/delete/:id', (req, res) => {
   const id = req.params.id;
