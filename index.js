@@ -121,7 +121,7 @@ app.post('/update/:id', async (req, res) => {
     const params = {
       TableName: 'movies',
       Key: {
-        EIB: id,
+        id: id,
       },
       UpdateExpression: 'set #t = :t, #d = :d, #g = :g, #i = :i',
       ExpressionAttributeNames: {
@@ -139,7 +139,7 @@ app.post('/update/:id', async (req, res) => {
       ReturnValues: 'UPDATED_NEW',
     };
 
-    const result = await docClient.update(params).promise();
+    const result = await dynamoDb.update(params).promise();
     console.log('Updated item:', result);
 
     res.redirect('/');
