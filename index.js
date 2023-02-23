@@ -97,56 +97,76 @@ app.post('/create', upload.single('image'), (req, res) => {
   });
 });
 
+
 app.get('/update/:id', (req, res) => {
   const id = req.params.id;
-  // Add code to fetch the data for the specific media item from your database
-  const item = {}; // Replace with the fetched data
-  res.render('update', { title: 'Update Media Item', item: item });
+  const params = {
+    TableName: 'movies',
+    Key: {
+      'id': id
+    }
+  };
+  docClient.get(params, (err, data) => {
+    if (err) {
+      console.log('Error: ', err);
+    } else {
+      const item = data.Item;
+      res.render('update', { title: 'Update Media Item', item: item });
+    }
+  });
 });
 
-app.post('/update/:id', async (req, res) => {
+app.post('/update/:id', upload.single('Image'), (req, res) => {
   const id = req.params.id;
   const title = req.body.Title;
   const description = req.body.Description;
   const tags = req.body.Tags;
+  let image = '';
 
-  // Check if an image was uploaded
-  let image = req.body.Image;
+  // Upload image to S3 if it exists
   if (req.file) {
-    image = req.file.filename;
-  }
-
-  try {
-    // Update the item in the DynamoDB table
+    const fileContent = fs.readFileSync(req.file.path);
     const params = {
-      TableName: 'movies',
-      Key: {
-        id: id,
-      },
-      UpdateExpression: 'set #t = :t, #d = :d, #g = :g, #i = :i',
-      ExpressionAttributeNames: {
-        '#t': 'Title',
-        '#d': 'Description',
-        '#g': 'Tags',
-        '#i': 'Image',
-      },
-      ExpressionAttributeValues: {
-        ':t': title,
-        ':d': description,
-        ':g': tags,
-        ':i': image,
-      },
-      ReturnValues: 'UPDATED_NEW',
+      Bucket: 'mediasharingapp',
+      Key: req.file.originalname,
+      Body: fileContent,
+      ACL: 'public-read'
     };
-
-    const result = await dynamoDb.update(params).promise();
-    console.log('Updated item:', result);
-
-    res.redirect('/');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('An error occurred while updating the item.');
+    s3.upload(params, (err, data) => {
+      if (err) {
+        console.log('Error: ', err);
+      } else {
+        image = data.Key;
+      }
+    });
   }
+
+  // Update item in DynamoDB
+  const params = {
+    TableName: 'movies',
+    Key: {
+      'id': id
+    },
+    UpdateExpression: 'set Title = :title, Description = :description, Tags = :tags' + (image ? ', Image = :image' : ''),
+    ExpressionAttributeValues: {
+      ':title': title,
+      ':description': description,
+      ':tags': tags
+    }
+  };
+
+  if (image) {
+    params.ExpressionAttributeValues[':image'] = image;
+  }
+
+  docClient.update(params, (err, data) => {
+    if (err) {
+      console.log('Error: ', err);
+    } else {
+      console.log('Item updated successfully!');
+      res.redirect('/');
+    }
+  });
 });
 
 
