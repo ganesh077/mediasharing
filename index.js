@@ -119,9 +119,9 @@ app.post('/update/:id', async (req, res) => {
   try {
     // Update the item in the DynamoDB table
     const params = {
-      TableName: "movies",
+      TableName: 'movies',
       Key: {
-        id: id,
+        EIB: id,
       },
       UpdateExpression: 'set #t = :t, #d = :d, #g = :g, #i = :i',
       ExpressionAttributeNames: {
